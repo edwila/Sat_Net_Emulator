@@ -1,0 +1,3 @@
+/mnt/c/Users/gensc/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/station.dir
+/mnt/c/Users/gensc/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/gensc/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/rebuild_cache.dir
