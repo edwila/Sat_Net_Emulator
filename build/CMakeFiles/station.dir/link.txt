@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/station.dir/Stations/Runner.cc.o CMakeFiles/station.dir/Helpers/Satellites.cc.o -o bin/station 
