@@ -13,7 +13,10 @@ int main(){
 
     std::cout << "Launching workers...\n";
 
-    // Reserve shared memory here
+    // Reserve shared memory here, before launching
+    
+
+
     system(("cmd.exe /c start wsl ./satellite_worker " + std::to_string(num_sats)).c_str());
     system(("cmd.exe /c start wsl ./user_worker " + std::to_string(num_users)).c_str());
 

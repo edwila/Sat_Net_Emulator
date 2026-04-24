@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
             auto [x, y, z] = sat_proc.get_position(idx);
 
-            std::cout << "Satellite [" << idx << "] : <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n>> ";
+            std::cout << "Satellite [" << idx << "] [@" << sat_proc.get_elapsed_time().count() << "] : <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n>> ";
         }
     }
 

@@ -65,6 +65,8 @@ void User_Processor::populate(U16 amount = 0xFFFF) {
         container.positions.Y[i] = y;
         container.positions.Z[i] = z;
 
-        std::cout << "<" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n>> ";
+        std::cout << "[User " << i << "]: <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n";
     }
+    
+    std::cout << ">> ";
 };

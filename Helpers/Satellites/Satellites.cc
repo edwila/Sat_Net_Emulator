@@ -66,7 +66,12 @@ void Satellite_Processor::sat_helper(float dt, U16 batch_size, unsigned int thre
         p_y = _mm256_fmadd_ps(v_y, dt_avx, p_y);
         p_z = _mm256_fmadd_ps(v_z, dt_avx, p_z);
 
-        // storeu it B)
+        // storeu velocities B)
+        _mm256_storeu_ps(&container.velocities.X[sat_idx], v_x);
+        _mm256_storeu_ps(&container.velocities.Y[sat_idx], v_y);
+        _mm256_storeu_ps(&container.velocities.Z[sat_idx], v_z);
+
+        // storeu positions B)
         _mm256_storeu_ps(&container.positions.X[sat_idx], p_x);
         _mm256_storeu_ps(&container.positions.Y[sat_idx], p_y);
         _mm256_storeu_ps(&container.positions.Z[sat_idx], p_z);
@@ -115,8 +120,6 @@ void Satellite_Processor::populate(U16 amount = 0xFFFF) {
         z: LEO_RAD * cos(random_phi)
         */
 
-        // TODO: SIMD HERE TOO
-
         float random_theta = theta_dist(gen);
         float random_phi = phi_dist(gen);
 
@@ -136,8 +139,10 @@ void Satellite_Processor::populate(U16 amount = 0xFFFF) {
 
         container.velocities.X[i] = container.velocities.Y[i] = container.velocities.Z[i] = 0;
 
-        std::cout << "<" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n>> ";
+        std::cout << "[Satellite " << i << "]: <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n";
     }
+
+    std::cout << ">> ";
 
     // Batch satellites into threads here, and compute their orbital math using SIMD
     // This will allow each thread to process the orbital mechanics of 8 satellites simultaneously
