@@ -5,6 +5,11 @@
 #include <immintrin.h> // AVX2 register functionality
 #include <array> // std::array<>()
 #include <thread> // std::thread::Hardware_Concurrency
+#include <atomic> // std::atomic
+#include <sys/mman.h> // mmap
+#include <sys/stat.h>
+#include <fcntl.h> // flags
+#include <unistd.h> // modes
 
 // Types
 using U8 = uint8_t;
@@ -53,3 +58,24 @@ struct Satellites {
 
     U16 initialized_satellites = 0;
 };
+
+struct response_struct {
+    U16 satellite_id;
+    
+    float X, Y, Z;
+}; // 16 bytes (2 + 4 + 4 + 4 = 2 + 12 = 14 + 2[PADDING] = 16)
+
+// Only station or satellite need to know how this struct is structured
+#if defined(SAT_ACCESS) || defined(STATION_ACCESS)
+struct satellite_station_container {
+    std::array<U16, 64> requests;
+    std::array<response_struct, 64> responses;
+
+    alignas(64) std::atomic<U32> req_sat_tail;
+    alignas(64) std::atomic<U32> req_station_tail;
+    alignas(64) std::atomic<U32> res_station_tail;
+    alignas(64) std::atomic<U32> res_sat_tail;
+
+    bool initialized = false;
+};
+#endif

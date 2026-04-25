@@ -137,12 +137,12 @@ void Satellite_Processor::populate(U16 amount = 0xFFFF) {
         container.positions.Y[i] = y;
         container.positions.Z[i] = z;
 
+        // Initial velocity = <0, 0, 0> => Falling towards the center of the Earth
+        // TODO: Adjust to be orthogonal to satellite's position vector
         container.velocities.X[i] = container.velocities.Y[i] = container.velocities.Z[i] = 0;
 
         std::cout << "[Satellite " << i << "]: <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n";
     }
-
-    std::cout << ">> ";
 
     // Batch satellites into threads here, and compute their orbital math using SIMD
     // This will allow each thread to process the orbital mechanics of 8 satellites simultaneously

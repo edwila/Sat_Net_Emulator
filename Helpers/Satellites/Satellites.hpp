@@ -1,3 +1,7 @@
+#ifndef SAT_ACCESS
+#define SAT_ACCESS
+#endif
+
 #include "../../Dependencies/consts.hpp"
 #include <chrono>
 #include <vector>
@@ -11,7 +15,7 @@ class Satellite_Processor {
         std::chrono::steady_clock::time_point start; // Start timestamp
         Satellites container;
         std::vector<std::thread> threads;
-        float time_scalar = 1.0f, physics_rate = 1.0f/60.0f; // How much faster time moves (sim time), and the rate for physics
+        float time_scalar = 1.0f; // How much faster time moves (sim time)
         bool active;
         void sat_helper(float dt, U16 batch_size, unsigned int thread_index, U16 end_idx_for_thread);
     public:

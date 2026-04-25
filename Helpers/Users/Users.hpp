@@ -1,3 +1,7 @@
+#ifndef USER_ACCESS
+#define USER_ACCESS
+#endif
+
 #include "../../Dependencies/consts.hpp"
 #include <chrono>
 #include <vector>
