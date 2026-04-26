@@ -324,8 +324,58 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
   /usr/include/c++/12/bits/basic_ios.tcc \
   /usr/include/c++/12/bits/ostream.tcc \
   /usr/include/c++/12/istream \
-  /usr/include/c++/12/bits/istream.tcc
+  /usr/include/c++/12/bits/istream.tcc \
+  /usr/include/c++/12/cmath \
+  /usr/include/math.h \
+  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
+  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
+  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
+  /usr/include/c++/12/bits/specfun.h \
+  /usr/include/c++/12/tr1/gamma.tcc \
+  /usr/include/c++/12/tr1/special_function_util.h \
+  /usr/include/c++/12/tr1/bessel_function.tcc \
+  /usr/include/c++/12/tr1/beta_function.tcc \
+  /usr/include/c++/12/tr1/ell_integral.tcc \
+  /usr/include/c++/12/tr1/exp_integral.tcc \
+  /usr/include/c++/12/tr1/hypergeometric.tcc \
+  /usr/include/c++/12/tr1/legendre_function.tcc \
+  /usr/include/c++/12/tr1/modified_bessel_func.tcc \
+  /usr/include/c++/12/tr1/poly_hermite.tcc \
+  /usr/include/c++/12/tr1/poly_laguerre.tcc \
+  /usr/include/c++/12/tr1/riemann_zeta.tcc
 
+
+/usr/include/c++/12/tr1/poly_hermite.tcc:
+
+/usr/include/c++/12/tr1/legendre_function.tcc:
+
+/usr/include/c++/12/tr1/ell_integral.tcc:
+
+/usr/include/c++/12/tr1/beta_function.tcc:
+
+/usr/include/c++/12/tr1/special_function_util.h:
+
+/usr/include/c++/12/bits/specfun.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
+
+/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
+
+/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+
+/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+
+/usr/include/x86_64-linux-gnu/bits/math-vector.h:
+
+/usr/include/c++/12/tr1/riemann_zeta.tcc:
 
 /usr/include/c++/12/bits/basic_ios.tcc:
 
@@ -334,6 +384,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 /usr/include/c++/12/bits/streambuf_iterator.h:
 
 /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
+
+/usr/include/c++/12/tr1/hypergeometric.tcc:
 
 /usr/include/c++/12/cwctype:
 
@@ -449,6 +501,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 
 /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
 
+/usr/include/c++/12/tr1/gamma.tcc:
+
 /usr/include/linux/stat.h:
 
 /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
@@ -512,6 +566,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 /usr/include/x86_64-linux-gnu/bits/waitstatus.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
+
+/usr/include/c++/12/tr1/modified_bessel_func.tcc:
 
 /usr/include/stdlib.h:
 
@@ -603,6 +659,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512vnnivlintrin.h:
 
+/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
+
 /usr/lib/gcc/x86_64-linux-gnu/12/include/wmmintrin.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
@@ -629,6 +687,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/wbnoinvdintrin.h:
 
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
 /usr/include/x86_64-linux-gnu/c++/12/bits/error_constants.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
@@ -650,6 +710,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 /usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
+
+/usr/include/c++/12/cmath:
 
 /usr/include/x86_64-linux-gnu/bits/types/__sigset_t.h:
 
@@ -708,6 +770,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 /usr/lib/gcc/x86_64-linux-gnu/12/include/movdirintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/xmmintrin.h:
+
+/usr/include/c++/12/tr1/poly_laguerre.tcc:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512bwintrin.h:
 
@@ -799,6 +863,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/gfniintrin.h:
 
+/usr/include/c++/12/tr1/exp_integral.tcc:
+
 /usr/lib/gcc/x86_64-linux-gnu/12/include/vpclmulqdqintrin.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/12/include/avx512bf16vlintrin.h:
@@ -865,9 +931,13 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 
 /usr/include/x86_64-linux-gnu/bits/cpu-set.h:
 
+/usr/include/c++/12/tr1/bessel_function.tcc:
+
 /usr/include/c++/12/cwchar:
 
 /usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+
+/usr/include/math.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
 
@@ -962,6 +1032,8 @@ CMakeFiles/station_driver.dir/Stations/Station.cc.o: ../Stations/Station.cc \
 /usr/include/x86_64-linux-gnu/asm/posix_types.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
 
 /usr/include/linux/falloc.h:
 

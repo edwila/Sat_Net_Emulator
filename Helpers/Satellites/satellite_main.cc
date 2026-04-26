@@ -10,35 +10,27 @@ int main(int argc, char* argv[]) {
 
     std::cout << "[Satellite Worker] Opening shared memory with station...\n";
 
-    int station_satellite_fd = shm_open("/station_satellite_communication", O_RDWR, 0600);
+    int global_rf_space_fd = shm_open("/global_rf_space", O_CREAT | O_RDWR, 0600);
+    // This shared memory will be for satellites communicating with the station (satellite requesting routing table, station providing routing table)
 
-    unsigned long long len = sizeof(satellite_station_container);
+    unsigned long long len = sizeof(shared_mem_container);
 
-    satellite_station_container* chunk1 = (satellite_station_container*)mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED_VALIDATE, station_satellite_fd, 0);
+    int truncate_result = ftruncate(global_rf_space_fd, len);
+
+    if(truncate_result == -1){
+        std::cout << "[Satellite Worker] Failed to truncate fd [" << global_rf_space_fd << "]! Err: " << errno << "\n";
+
+        return 1;
+    }
+
+    shared_mem_container* chunk1 = (shared_mem_container*)mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, global_rf_space_fd, 0);
 
     std::cout << "[Satellite Worker] Shared memory chunk loaded successfully. Is initialized? " << std::boolalpha << chunk1->initialized << "\n";
 
     std::cout << "[Satellite Worker] Booting up with " << num_sats << " satellites...\n";
 
-    Satellite_Processor sat_proc;
+    Satellite_Processor sat_proc(&chunk1->container);
     sat_proc.populate(num_sats);
-
-    std::cout << "[Satellite Worker] Spawning thread for request handling...\n";
-
-    std::thread([chunk1, &sat_proc](){
-        while(true){
-            while(chunk1->req_sat_tail != chunk1->req_station_tail){
-                // There is a request!
-                auto sat_id = chunk1->requests[chunk1->req_sat_tail & 63];
-                auto [x, y, z] = sat_proc.get_position(sat_id);
-                chunk1->responses[chunk1->res_sat_tail & 63] = {sat_id, x, y, z};
-                chunk1->res_sat_tail.fetch_add(1);
-                chunk1->req_sat_tail.fetch_add(1);
-            }
-
-            std::this_thread::yield();
-        }
-    }).detach();
 
     std::cout << "[Satellite Worker] Buffer thread spawned!\n";
 
@@ -59,6 +51,8 @@ int main(int argc, char* argv[]) {
             std::cout << "Satellite [" << idx << "] [@" << sat_proc.get_elapsed_time().count() << "] : <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n>> ";
         }
     }
+
+    sat_proc.kill();
 
     return 0;
 }

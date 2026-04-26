@@ -20,36 +20,58 @@ int main(){
     // We want 2 blocks total of reserved memory
 
     /*
-    FIRST CHUNK:
     Station-Satellite communication:
     The satellite worker and the station will have two shared buffers
-    [BUFFER 1 - REQUEST BUFFER] : This buffer will contain satellite IDs (array of raw U16). Station will write to this, satellite will read from this. It will contain the satellites that station needs.
-    [BUFFER 2 - RESPONSE BUFFER] : This buffer will contain the response struct. Response structs (defined in consts.hpp) consist of sat_id (U16) and 3x float (X, Y, Z).
+    [BUFFER 1 - REQUEST BUFFER]: This buffer will contain routing table requests from satellites (i.e., satellite 3 requests its routing table, ground station checks current timestamp, then gives it its routing table).
+    [BUFFER 2 - RESPONSE BUFFER]: This buffer will contain the actual routing table. It will also contain a satellite_id so that the satellite that requested it can get it.
     */
 
-    int station_satellite_fd = shm_open("/station_satellite_communication", O_CREAT | O_RDWR, 0600);
+    /*
+    We want to emulate this communication scheme:
+        User -> Satellite -> ... Satellite ... -> Ground Station/User
 
-    unsigned long long len = sizeof(satellite_station_container);
+    Right now, our communication scheme is facing in this direction:
+        User -> Ground Station -> ... Satellite ... -> Ground Station
+    
+    We need to get rid of the first Ground Station call. We can do this by:
+        User:
+            - Calculates optimal satellite to connect to (using Beam Planner)
+            - Writes packet to the "global RF" (simulates writing to the satellite/sending it a signal) (shared memory between satellite driver and user driver)
+        
+        Satellite:
+            - Reads from global RF buffer to pick up packets
+            - Simulates latency, then routes them
 
-    int truncate_result = ftruncate(station_satellite_fd, len);
+    So where does the station come in play?
+    The answer to that is whenever the satellites need it!
+    
+    The station will be responsible for generating the routing tables that the satellites will retrieve (from the shared memory).
+    
+    The station generates routing tables in advance, writes the current timestamped one to memory, and continues on with its life.
+    Satellites retrieve their routing table entry, then go on with their lives.
+    */
+
+    int global_rf_space_fd = shm_open("/global_rf_space", O_CREAT | O_RDWR, 0600);
+    // This shared memory will be for satellites communicating with the station (satellite requesting routing table, station providing routing table)
+
+    unsigned long long len = sizeof(shared_mem_container);
+
+    int truncate_result = ftruncate(global_rf_space_fd, len);
 
     if(truncate_result == -1){
-        std::cout << "[Station] Failed to truncate fd [" << station_satellite_fd << "]! Err: " << errno << "\n";
+        std::cout << "[Station] Failed to truncate fd [" << global_rf_space_fd << "]! Err: " << errno << "\n";
 
         return 1;
     }
 
-    satellite_station_container* chunk1 = (satellite_station_container*)mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED_VALIDATE, station_satellite_fd, 0);
+
+    // Ground station only ever truly communicates with the satellites
+
+    // But our satellites will exist in shared memory (so that user can run beam planner on it)
+
+    shared_mem_container* chunk1 = (shared_mem_container*)mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, global_rf_space_fd, 0);
 
     chunk1->initialized = true;
-
-    /*
-    SECOND CHUNK:
-    Station-User communication:
-    The user worker and the station worker will have two shared buffers
-    [BUFFER 1 - REQUEST BUFFER] : This buffer will contain satellite IDs (array of raw U16). User will write to this, station will read from this and copy them to its [BUFFER 1] within its communication to satellite worker.
-    [BUFFER 2 - RESPONSE BUFFER] : This buffer will contain the response structs (as defined in consts.hpp). These will be the responses that the station will receive from the satellite worker.
-    */
 
     std::cout << "[Station] Launching workers...\n";
 
@@ -67,7 +89,7 @@ int main(){
             // unmap
             munmap((void*)chunk1, len);
             // close the fd
-            close(station_satellite_fd);
+            close(global_rf_space_fd);
             // unlink
             shm_unlink("/station_satellite_communication");
 
@@ -79,17 +101,10 @@ int main(){
             std::cin >> sat_id;
 
             std::cout << "[Station] Requesting satellite " << sat_id << " information...\n";
-            chunk1->requests[chunk1->req_station_tail & 63] = sat_id;
-            chunk1->req_station_tail.fetch_add(1);
-            while(chunk1->res_station_tail == chunk1->res_sat_tail){}
-            while(chunk1->res_station_tail != chunk1->res_sat_tail){
-                auto storage = chunk1->responses[chunk1->res_station_tail & 63];
-                if(storage.satellite_id == sat_id){
-                    // Received information!
-                    std::cout << "[Station] Satellite [" << storage.satellite_id << "]: <" << storage.X << ", " << storage.Y << ", " << storage.Z << "> [" << std::sqrt(storage.X*storage.X + storage.Y*storage.Y + storage.Z*storage.Z) << "]\n";
-                }
-                chunk1->res_station_tail.fetch_add(1);
-            }
+
+            float X = chunk1->container.positions.X[sat_id], Y = chunk1->container.positions.Y[sat_id], Z = chunk1->container.positions.Z[sat_id];
+            
+            std::cout << "[Station] Satellite [" << sat_id << "]: <" << X << ", " << Y << ", " << Z << "> [" << std::sqrt(X*X + Y*Y + Z*Z) << "]\n";
         }
 
         std::cout << ">> ";

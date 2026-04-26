@@ -28,6 +28,8 @@ static constexpr U32 LEO_ALTITUDE = 542900; // Low Earth Orbit altitude (R_EARTH
 static constexpr float PI = 3.1415926;
 static constexpr float mu = 3.986004418e14;
 
+class Satellite_Processor;
+
 // Usables
 struct Vector3 {
     float X, Y, Z;
@@ -60,22 +62,17 @@ struct Satellites {
 };
 
 struct response_struct {
+    // Response struct (the station driver will populate the routing table in this when a satellite sends a request)
     U16 satellite_id;
+
+    std::array<U16, MAX_SATELLITES> routing_table; // index at i tells us the routing table for the route that this satellite (satellite_id) must take to get to satellite i
     
     float X, Y, Z;
 }; // 16 bytes (2 + 4 + 4 + 4 = 2 + 12 = 14 + 2[PADDING] = 16)
 
 // Only station or satellite need to know how this struct is structured
-#if defined(SAT_ACCESS) || defined(STATION_ACCESS)
-struct satellite_station_container {
-    std::array<U16, 64> requests;
-    std::array<response_struct, 64> responses;
-
-    alignas(64) std::atomic<U32> req_sat_tail;
-    alignas(64) std::atomic<U32> req_station_tail;
-    alignas(64) std::atomic<U32> res_station_tail;
-    alignas(64) std::atomic<U32> res_sat_tail;
+struct shared_mem_container {
+    Satellites container;
 
     bool initialized = false;
 };
-#endif

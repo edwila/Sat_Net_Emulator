@@ -1,15 +1,25 @@
 #include "Satellites.hpp"
 
-Satellite_Processor::Satellite_Processor(){
+Satellite_Processor::Satellite_Processor(Satellites* ctr){
+    container = ctr;
     start = std::chrono::steady_clock::now();
     threads.reserve(MAX_THREADS);
 };
 
 Satellite_Processor::~Satellite_Processor(){
+    kill();
+};
+
+void Satellite_Processor::kill(){
     active = false;
+
     for(std::thread& t : threads){
         if(t.joinable()) t.join();
     }
+};
+
+bool Satellite_Processor::is_alive() const {
+    return active;
 };
 
 ms Satellite_Processor::get_elapsed_time(){
@@ -18,9 +28,9 @@ ms Satellite_Processor::get_elapsed_time(){
 
 std::tuple<float, float, float> Satellite_Processor::get_position(size_t idx){
     return {
-        container.positions.X[idx],
-        container.positions.Y[idx],
-        container.positions.Z[idx]
+        container->positions.X[idx],
+        container->positions.Y[idx],
+        container->positions.Z[idx]
     };;
 };
 
@@ -37,14 +47,14 @@ void Satellite_Processor::sat_helper(float dt, U16 batch_size, unsigned int thre
         // p = p_pur + v*dt
         // use SIMD to calculate 8 x's, 8 y's, and 8 z's
 
-        __m256 p_x = _mm256_loadu_ps(&container.positions.X[sat_idx]);
-        __m256 p_y = _mm256_loadu_ps(&container.positions.Y[sat_idx]);
-        __m256 p_z = _mm256_loadu_ps(&container.positions.Z[sat_idx]);
+        __m256 p_x = _mm256_loadu_ps(&container->positions.X[sat_idx]);
+        __m256 p_y = _mm256_loadu_ps(&container->positions.Y[sat_idx]);
+        __m256 p_z = _mm256_loadu_ps(&container->positions.Z[sat_idx]);
         // Now we have 8 initial positions loaded into 3 AVX registers
 
-        __m256 v_x = _mm256_loadu_ps(&container.velocities.X[sat_idx]);
-        __m256 v_y = _mm256_loadu_ps(&container.velocities.Y[sat_idx]);
-        __m256 v_z = _mm256_loadu_ps(&container.velocities.Z[sat_idx]);
+        __m256 v_x = _mm256_loadu_ps(&container->velocities.X[sat_idx]);
+        __m256 v_y = _mm256_loadu_ps(&container->velocities.Y[sat_idx]);
+        __m256 v_z = _mm256_loadu_ps(&container->velocities.Z[sat_idx]);
         // And 8 velocities
 
         __m256 dt_avx = _mm256_set1_ps(dt);
@@ -67,39 +77,39 @@ void Satellite_Processor::sat_helper(float dt, U16 batch_size, unsigned int thre
         p_z = _mm256_fmadd_ps(v_z, dt_avx, p_z);
 
         // storeu velocities B)
-        _mm256_storeu_ps(&container.velocities.X[sat_idx], v_x);
-        _mm256_storeu_ps(&container.velocities.Y[sat_idx], v_y);
-        _mm256_storeu_ps(&container.velocities.Z[sat_idx], v_z);
+        _mm256_storeu_ps(&container->velocities.X[sat_idx], v_x);
+        _mm256_storeu_ps(&container->velocities.Y[sat_idx], v_y);
+        _mm256_storeu_ps(&container->velocities.Z[sat_idx], v_z);
 
         // storeu positions B)
-        _mm256_storeu_ps(&container.positions.X[sat_idx], p_x);
-        _mm256_storeu_ps(&container.positions.Y[sat_idx], p_y);
-        _mm256_storeu_ps(&container.positions.Z[sat_idx], p_z);
+        _mm256_storeu_ps(&container->positions.X[sat_idx], p_x);
+        _mm256_storeu_ps(&container->positions.Y[sat_idx], p_y);
+        _mm256_storeu_ps(&container->positions.Z[sat_idx], p_z);
     }
 
     for(; sat_idx < end_idx_for_thread; sat_idx++) {
-        float px = container.positions.X[sat_idx];
-        float py = container.positions.Y[sat_idx];
-        float pz = container.positions.Z[sat_idx];
+        float px = container->positions.X[sat_idx];
+        float py = container->positions.Y[sat_idx];
+        float pz = container->positions.Z[sat_idx];
 
         float r2 = px*px + py*py + pz*pz;
         float inv_r3 = 1.0 / (std::sqrt(r2) * r2);
         float g_dt = -mu * dt * inv_r3;
 
-        container.velocities.X[sat_idx] += px * g_dt;
-        container.velocities.Y[sat_idx] += py * g_dt;
-        container.velocities.Z[sat_idx] += pz * g_dt;
+        container->velocities.X[sat_idx] += px * g_dt;
+        container->velocities.Y[sat_idx] += py * g_dt;
+        container->velocities.Z[sat_idx] += pz * g_dt;
 
-        container.positions.X[sat_idx] += container.velocities.X[sat_idx] * dt;
-        container.positions.Y[sat_idx] += container.velocities.Y[sat_idx] * dt;
-        container.positions.Z[sat_idx] += container.velocities.Z[sat_idx] * dt;
+        container->positions.X[sat_idx] += container->velocities.X[sat_idx] * dt;
+        container->positions.Y[sat_idx] += container->velocities.Y[sat_idx] * dt;
+        container->positions.Z[sat_idx] += container->velocities.Z[sat_idx] * dt;
     }
 }
 
 // Populate satellite container
 void Satellite_Processor::populate(U16 amount = 0xFFFF) {
     active = true;
-    container.initialized_satellites = amount;
+    container->initialized_satellites = amount;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> theta_dist(0.0f, 2.0f * PI);
@@ -133,13 +143,13 @@ void Satellite_Processor::populate(U16 amount = 0xFFFF) {
         float T_y = t_dist(gen);
         float T_z = t_dist(gen);
 
-        container.positions.X[i] = x;
-        container.positions.Y[i] = y;
-        container.positions.Z[i] = z;
+        container->positions.X[i] = x;
+        container->positions.Y[i] = y;
+        container->positions.Z[i] = z;
 
         // Initial velocity = <0, 0, 0> => Falling towards the center of the Earth
         // TODO: Adjust to be orthogonal to satellite's position vector
-        container.velocities.X[i] = container.velocities.Y[i] = container.velocities.Z[i] = 0;
+        container->velocities.X[i] = container->velocities.Y[i] = container->velocities.Z[i] = 0;
 
         std::cout << "[Satellite " << i << "]: <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n";
     }

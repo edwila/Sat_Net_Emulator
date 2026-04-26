@@ -1,6 +1,10 @@
 #include "Users.hpp"
 
-User_Processor::User_Processor(){
+User_Processor::User_Processor(Satellites* ctr){
+    sat_container = ctr;
+
+    acting_user = -1;
+
     start = std::chrono::steady_clock::now();
     threads.reserve(MAX_THREADS);
 };
@@ -10,6 +14,19 @@ User_Processor::~User_Processor(){
     for(std::thread& t : threads){
         if(t.joinable()) t.join();
     }
+}
+
+int32_t User_Processor::get_acting_user() const {
+    return acting_user;
+}
+
+int32_t User_Processor::get_optimal_sat(U16 user_index) const {
+    // We want to return the optimal satellite ID for U16
+    // Recall that all satellites are stored at sat_container
+
+    U16 num_sats = sat_container->initialized_satellites;
+
+    return num_sats;
 }
 
 ms User_Processor::get_elapsed_time(){
@@ -22,6 +39,16 @@ std::tuple<float, float, float> User_Processor::get_position(size_t idx){
         container.positions.Y[idx],
         container.positions.Z[idx]
     };
+}
+
+void User_Processor::ssh(int32_t target_user){
+    acting_user = target_user;
+
+    if(acting_user == -1){
+        std::cout << "[User Worker] Disconnected from user SSH.\n";
+    } else{
+        std::cout << "[User Worker] SSH'd into user " << acting_user << "!\n";
+    }
 }
 
 // Populate user container
@@ -67,6 +94,4 @@ void User_Processor::populate(U16 amount = 0xFFFF) {
 
         std::cout << "[User " << i << "]: <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n";
     }
-    
-    std::cout << ">> ";
 };
