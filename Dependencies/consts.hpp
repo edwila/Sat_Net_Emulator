@@ -8,6 +8,7 @@
 #include <atomic> // std::atomic
 #include <sys/mman.h> // mmap
 #include <sys/stat.h>
+#include <cstring> // std::memcpy
 #include <fcntl.h> // flags
 #include <unistd.h> // modes
 #include <cmath> // std::cos
@@ -69,9 +70,26 @@ struct response_struct {
     float X, Y, Z;
 }; // 16 bytes (2 + 4 + 4 + 4 = 2 + 12 = 14 + 2[PADDING] = 16)
 
+struct packet {
+    // Network packet. Used for users communicating with other users
+    char msg[64];
+
+    U16 source_user;
+    U16 target_user;
+    U16 next_sat; // We need to store the next hop because we can't just place this packet into the satellite's buffer
+
+    // The satellite we want to target
+    U16 target_sat;
+};
+
 // Only station or satellite need to know how this struct is structured
 struct shared_mem_container {
     Satellites container;
+
+    std::array<packet, 64> packets; // Array of packets. Simulates the packet sent from a user to a satellite
+
+    alignas(64) std::atomic<U32> read_tail;
+    alignas(64) std::atomic<U32> write_tail;
 
     bool initialized = false;
 };

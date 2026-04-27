@@ -32,6 +32,25 @@ int main(int argc, char* argv[]) {
     Satellite_Processor sat_proc(&chunk1->container);
     sat_proc.populate(num_sats);
 
+    std::cout << "[Satellite Worker] Starting routing thread...\n";
+
+    std::thread([chunk1, &sat_proc](){
+        while(sat_proc.is_alive()){
+            while(chunk1->read_tail != chunk1->write_tail){
+                // There are packets needing to be routed
+                packet read_packet = chunk1->packets[chunk1->read_tail];
+                std::cout << "[Satellite Worker] Read packet! Target satellite: [" << read_packet.target_sat << "] from user [" << read_packet.source_user << "] with message [";
+                for(char* m = read_packet.msg; *m; m++){
+                    std::cout << *m;
+                }
+                std::cout << "]!\n";
+                chunk1->read_tail.fetch_add(1);
+            }
+
+            std::this_thread::yield();
+        }
+    }).detach();
+
     std::cout << "[Satellite Worker] Ready.\n";
 
     std::string opt;
@@ -46,8 +65,10 @@ int main(int argc, char* argv[]) {
 
             auto [x, y, z] = sat_proc.get_position(idx);
 
-            std::cout << "Satellite [" << idx << "] [@" << sat_proc.get_elapsed_time().count() << "] : <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n>> ";
+            std::cout << "Satellite [" << idx << "] [@" << sat_proc.get_elapsed_time() << "] : <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n>> ";
         }
+
+        std::cout << ">> ";
     }
 
     sat_proc.kill();

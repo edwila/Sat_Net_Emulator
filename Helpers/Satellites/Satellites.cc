@@ -2,6 +2,7 @@
 
 Satellite_Processor::Satellite_Processor(Satellites* ctr){
     container = ctr;
+    active = true;
     start = std::chrono::steady_clock::now();
     threads.reserve(MAX_THREADS);
 };
@@ -22,8 +23,8 @@ bool Satellite_Processor::is_alive() const {
     return active;
 };
 
-ms Satellite_Processor::get_elapsed_time(){
-    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start);
+U32 Satellite_Processor::get_elapsed_time(){
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start).count();
 };
 
 std::tuple<float, float, float> Satellite_Processor::get_position(size_t idx){

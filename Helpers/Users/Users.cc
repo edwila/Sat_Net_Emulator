@@ -20,7 +20,8 @@ int32_t User_Processor::get_acting_user() const {
     return acting_user;
 }
 
-int32_t User_Processor::get_optimal_sat(U16 user_index) const {
+int32_t User_Processor::get_optimal_sat(U16 user_index, bool ensure_connection) const {
+    // If ensure_connection is true, this call will yield if there are no optimal satellites, repeatedly checking until there is a valid sat
     // We want to return the optimal satellite ID for U16
     // Recall that all satellites are stored at sat_container
 
@@ -30,11 +31,21 @@ int32_t User_Processor::get_optimal_sat(U16 user_index) const {
         container.positions.Z[user_index]
     }, sat_container);
 
+    if(ensure_connection && optimals.empty()){
+        while(optimals.empty()){
+            optimals = optimal_sats(Vector3{
+                container.positions.X[user_index],
+                container.positions.Y[user_index],
+                container.positions.Z[user_index]
+            }, sat_container);
+        }
+    }
+
     return optimals.empty() ? -1 : optimals.front();
 }
 
-ms User_Processor::get_elapsed_time(){
-    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start);
+U32 User_Processor::get_elapsed_time(){
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-start).count();
 }
 
 std::tuple<float, float, float> User_Processor::get_position(size_t idx){

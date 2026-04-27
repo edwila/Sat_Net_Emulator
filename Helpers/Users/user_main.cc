@@ -59,6 +59,30 @@ int main(int argc, char* argv[]) {
             } else{
                 std::cout << "[User Worker] User [" << user_index << "]'s optimal satellite is satellite [" << optimal_sat << "]\n";
             }
+        } else if(opt == "tell"){
+            int32_t acting_user = user_proc.get_acting_user();
+            if(acting_user == -1){
+                std::cout << "[User Worker] Please SSH into a user (using SSH <user_id>) before using tell.\n>> ";
+                std::getline(std::cin, opt);
+                continue;
+            }
+
+            U16 target_user;
+            std::string msg;
+
+            std::cin >> target_user;
+            std::getline(std::cin, msg);
+
+            packet to_push;
+            to_push.source_user = acting_user;
+            to_push.target_user = target_user;
+            to_push.target_sat = user_proc.get_optimal_sat(target_user);
+            to_push.next_sat = user_proc.get_optimal_sat(acting_user);
+
+            std::memcpy(to_push.msg, msg.c_str()+1, msg.length());
+
+            chunk1->packets[chunk1->write_tail & 63] = std::move(to_push);
+            chunk1->write_tail.fetch_add(1);
         }
 
         std::cout << (user_proc.get_acting_user() == -1 ? "" : ("[" + std::to_string(user_proc.get_acting_user()) + "] ")) << ">> ";

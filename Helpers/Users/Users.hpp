@@ -24,7 +24,7 @@ class User_Processor {
         User_Processor(Satellites* ctr); // Initializes start to be std::chrono::steady_clock::now()
         ~User_Processor();
 
-        ms get_elapsed_time(); // Return the elapsed time since 
+        U32 get_elapsed_time(); // Return the elapsed time since 
 
         std::tuple<float, float, float> get_position(size_t idx);
 
@@ -34,7 +34,7 @@ class User_Processor {
 
         int32_t get_acting_user() const;
 
-        int32_t get_optimal_sat(U16 user_index) const;
+        int32_t get_optimal_sat(U16 user_index, bool ensure_connection = false) const;
 
         // Populate user container
         void populate(U16 amount);

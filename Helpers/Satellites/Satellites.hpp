@@ -22,7 +22,7 @@ class Satellite_Processor {
         Satellite_Processor(Satellites* ctr); // Initializes start to be std::chrono::steady_clock::now()
         ~Satellite_Processor();
 
-        ms get_elapsed_time(); // Return the elapsed time since firing up the satellite processor
+        U32 get_elapsed_time(); // Return the elapsed time since firing up the satellite processor
 
         std::tuple<float, float, float> get_position(size_t idx);
 
