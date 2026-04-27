@@ -54,7 +54,11 @@ int main(int argc, char* argv[]) {
 
             int32_t optimal_sat = user_proc.get_optimal_sat(user_index); // -1 for no satellites, otherwise contains the satellite's ID
 
-            std::cout << "[User Worker] TODO! Calculate " << user_index << "'s optimal satellite.\n";
+            if(optimal_sat == -1){
+                std::cout << "[User Worker] User [" << user_index << "]'s has no viable satellite coverage.\n";
+            } else{
+                std::cout << "[User Worker] User [" << user_index << "]'s optimal satellite is satellite [" << optimal_sat << "]\n";
+            }
         }
 
         std::cout << (user_proc.get_acting_user() == -1 ? "" : ("[" + std::to_string(user_proc.get_acting_user()) + "] ")) << ">> ";

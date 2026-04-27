@@ -24,9 +24,13 @@ int32_t User_Processor::get_optimal_sat(U16 user_index) const {
     // We want to return the optimal satellite ID for U16
     // Recall that all satellites are stored at sat_container
 
-    U16 num_sats = sat_container->initialized_satellites;
+    std::vector<U16> optimals = optimal_sats(Vector3{
+        container.positions.X[user_index],
+        container.positions.Y[user_index],
+        container.positions.Z[user_index]
+    }, sat_container);
 
-    return num_sats;
+    return optimals.empty() ? -1 : optimals.front();
 }
 
 ms User_Processor::get_elapsed_time(){
@@ -35,6 +39,14 @@ ms User_Processor::get_elapsed_time(){
 
 std::tuple<float, float, float> User_Processor::get_position(size_t idx){
     return {
+        container.positions.X[idx],
+        container.positions.Y[idx],
+        container.positions.Z[idx]
+    };
+}
+
+Vector3 User_Processor::get_position_as_vector(size_t idx){
+    return Vector3{
         container.positions.X[idx],
         container.positions.Y[idx],
         container.positions.Z[idx]

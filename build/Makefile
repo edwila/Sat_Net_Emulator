@@ -227,6 +227,30 @@ Helpers/Users/Users.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/user_worker.dir/build.make CMakeFiles/user_worker.dir/Helpers/Users/Users.cc.s
 .PHONY : Helpers/Users/Users.cc.s
 
+Helpers/Users/optimal.o: Helpers/Users/optimal.cc.o
+.PHONY : Helpers/Users/optimal.o
+
+# target to build an object file
+Helpers/Users/optimal.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/user_worker.dir/build.make CMakeFiles/user_worker.dir/Helpers/Users/optimal.cc.o
+.PHONY : Helpers/Users/optimal.cc.o
+
+Helpers/Users/optimal.i: Helpers/Users/optimal.cc.i
+.PHONY : Helpers/Users/optimal.i
+
+# target to preprocess a source file
+Helpers/Users/optimal.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/user_worker.dir/build.make CMakeFiles/user_worker.dir/Helpers/Users/optimal.cc.i
+.PHONY : Helpers/Users/optimal.cc.i
+
+Helpers/Users/optimal.s: Helpers/Users/optimal.cc.s
+.PHONY : Helpers/Users/optimal.s
+
+# target to generate assembly for a file
+Helpers/Users/optimal.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/user_worker.dir/build.make CMakeFiles/user_worker.dir/Helpers/Users/optimal.cc.s
+.PHONY : Helpers/Users/optimal.cc.s
+
 Helpers/Users/user_main.o: Helpers/Users/user_main.cc.o
 .PHONY : Helpers/Users/user_main.o
 
@@ -295,6 +319,9 @@ help:
 	@echo "... Helpers/Users/Users.o"
 	@echo "... Helpers/Users/Users.i"
 	@echo "... Helpers/Users/Users.s"
+	@echo "... Helpers/Users/optimal.o"
+	@echo "... Helpers/Users/optimal.i"
+	@echo "... Helpers/Users/optimal.s"
 	@echo "... Helpers/Users/user_main.o"
 	@echo "... Helpers/Users/user_main.i"
 	@echo "... Helpers/Users/user_main.s"

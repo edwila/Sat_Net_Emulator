@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/user_worker.dir/Helpers/Users/Users.cc.o"
   "CMakeFiles/user_worker.dir/Helpers/Users/Users.cc.o.d"
+  "CMakeFiles/user_worker.dir/Helpers/Users/optimal.cc.o"
+  "CMakeFiles/user_worker.dir/Helpers/Users/optimal.cc.o.d"
   "CMakeFiles/user_worker.dir/Helpers/Users/user_main.cc.o"
   "CMakeFiles/user_worker.dir/Helpers/Users/user_main.cc.o.d"
   "bin/user_worker"

@@ -16,6 +16,7 @@ set(SATELLITE_SOURCES
 set(USER_SOURCES
     Helpers/Users/user_main.cc
     Helpers/Users/Users.cc
+    Helpers/Users/optimal.cc
 )
 
 add_library(shared_interface INTERFACE)

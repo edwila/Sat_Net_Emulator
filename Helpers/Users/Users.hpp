@@ -3,6 +3,7 @@
 #endif
 
 #include "../../Dependencies/consts.hpp"
+#include "optimal.h"
 #include <chrono>
 #include <vector>
 #include <random>
@@ -26,6 +27,8 @@ class User_Processor {
         ms get_elapsed_time(); // Return the elapsed time since 
 
         std::tuple<float, float, float> get_position(size_t idx);
+
+        Vector3 get_position_as_vector(size_t idx);
 
         void ssh(int32_t target_user);
 

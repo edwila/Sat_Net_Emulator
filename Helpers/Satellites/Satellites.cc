@@ -44,7 +44,7 @@ void Satellite_Processor::sat_helper(float dt, U16 batch_size, unsigned int thre
         // steps:
         // calculate a
         // v = v_cur + a*dt
-        // p = p_pur + v*dt
+        // p = p_cur + v*dt
         // use SIMD to calculate 8 x's, 8 y's, and 8 z's
 
         __m256 p_x = _mm256_loadu_ps(&container->positions.X[sat_idx]);

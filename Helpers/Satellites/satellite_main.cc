@@ -10,7 +10,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "[Satellite Worker] Opening shared memory with station...\n";
 
-    int global_rf_space_fd = shm_open("/global_rf_space", O_CREAT | O_RDWR, 0600);
+    int global_rf_space_fd = shm_open("/global_rf_space", O_RDWR, 0600);
     // This shared memory will be for satellites communicating with the station (satellite requesting routing table, station providing routing table)
 
     unsigned long long len = sizeof(shared_mem_container);
@@ -31,8 +31,6 @@ int main(int argc, char* argv[]) {
 
     Satellite_Processor sat_proc(&chunk1->container);
     sat_proc.populate(num_sats);
-
-    std::cout << "[Satellite Worker] Buffer thread spawned!\n";
 
     std::cout << "[Satellite Worker] Ready.\n";
 

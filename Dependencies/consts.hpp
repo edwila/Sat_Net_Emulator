@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <fcntl.h> // flags
 #include <unistd.h> // modes
+#include <cmath> // std::cos
 
 // Types
 using U8 = uint8_t;
@@ -27,8 +28,6 @@ static constexpr U32 R_EARTH = 6378100; // Radius of the Earth
 static constexpr U32 LEO_ALTITUDE = 542900; // Low Earth Orbit altitude (R_EARTH + LEO_ALTITUDE)
 static constexpr float PI = 3.1415926;
 static constexpr float mu = 3.986004418e14;
-
-class Satellite_Processor;
 
 // Usables
 struct Vector3 {
