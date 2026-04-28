@@ -14,11 +14,15 @@ User_Processor::~User_Processor(){
     for(std::thread& t : threads){
         if(t.joinable()) t.join();
     }
-}
+};
 
 int32_t User_Processor::get_acting_user() const {
     return acting_user;
-}
+};
+
+bool User_Processor::is_alive() const {
+    return active;
+};
 
 int32_t User_Processor::get_optimal_sat(U16 user_index, bool ensure_connection) const {
     // If ensure_connection is true, this call will yield if there are no optimal satellites, repeatedly checking until there is a valid sat
@@ -68,9 +72,9 @@ void User_Processor::ssh(int32_t target_user){
     acting_user = target_user;
 
     if(acting_user == -1){
-        std::cout << "[User Worker] Disconnected from user SSH.\n";
+        out("[User Worker] Disconnected from user SSH.");
     } else{
-        std::cout << "[User Worker] SSH'd into user " << acting_user << "!\n";
+        out("[User Worker] SSH'd into user ", acting_user, "!");
     }
 }
 
@@ -115,6 +119,6 @@ void User_Processor::populate(U16 amount = 0xFFFF) {
         container.positions.Y[i] = y;
         container.positions.Z[i] = z;
 
-        std::cout << "[User " << i << "]: <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n";
+        out("[User ", i, "]: <", x, ", ", y, ", ", z, "> [", std::sqrt(x*x + y*y + z*z), "]");
     }
 };

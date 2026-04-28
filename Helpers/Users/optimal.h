@@ -65,9 +65,5 @@ struct user_container {
     };
 };
 
-float dot_func(const Vector3& a, const Vector3& b); // Dot product between vectors a and b
-
-float mag_sq(const Vector3& x); // Returns the magnitude of vector x without taking the sqrt
-
 // Generate a set of legal beams to cover as many users as possible.
 std::vector<U16> optimal_sats(const Vector3& user, const Satellites* sats);

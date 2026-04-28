@@ -12,6 +12,11 @@
 #include <fcntl.h> // flags
 #include <unistd.h> // modes
 #include <cmath> // std::cos
+#include <queue> // std::priority_queue
+#include <utility> // std::pair
+#include <queue> // std::queue
+#include <iostream> // std::cout, std::cin
+#include <functional> // std::function
 
 // Types
 using U8 = uint8_t;
@@ -33,10 +38,28 @@ static constexpr float mu = 3.986004418e14;
 // Usables
 struct Vector3 {
     float X, Y, Z;
-    Vector3 operator-(const Vector3& other){
+    Vector3 operator-(const Vector3& other) const {
         return {X-other.X, Y-other.Y, Z-other.Z};
-    }
+    };
+    Vector3 operator+(const Vector3& other) const {
+        return {X+other.X, Y+other.Y, Z+other.Z};
+    };
+    Vector3 operator*(float other) const {
+        return {X*other, Y*other, Z*other};
+    };
+    Vector3 operator/(float other) const {
+        return {X/other, Y/other, Z/other};
+    };
 };
+
+inline std::function<std::string()> cli_prompt_hook = []() { return ">> "; };
+
+template<typename... Args>
+inline void out(Args&&... args){
+    std::cout << "\r\033[2K";
+    ((std::cout << std::forward<Args>(args)), ...);
+    std::cout << "\n" << cli_prompt_hook() << std::flush;
+}
 
 template <U16 max_size>
 struct Coordinates {
@@ -61,25 +84,34 @@ struct Satellites {
     U16 initialized_satellites = 0;
 };
 
-struct response_struct {
-    // Response struct (the station driver will populate the routing table in this when a satellite sends a request)
-    U16 satellite_id;
+using r_t = std::array<std::array<U16, MAX_SATELLITES>, MAX_SATELLITES>;
 
-    std::array<U16, MAX_SATELLITES> routing_table; // index at i tells us the routing table for the route that this satellite (satellite_id) must take to get to satellite i
-    
-    float X, Y, Z;
-}; // 16 bytes (2 + 4 + 4 + 4 = 2 + 12 = 14 + 2[PADDING] = 16)
+struct routing_table {
+    alignas(64) std::atomic<U8> routing_table_key{0}; // 0 - Table A is active, 1 - Table B is active
+
+    r_t table_A;
+    r_t table_B;
+};
 
 struct packet {
     // Network packet. Used for users communicating with other users
     char msg[64];
 
-    U16 source_user;
-    U16 target_user;
+    U16 source_user, target_user;
+    
     U16 next_sat; // We need to store the next hop because we can't just place this packet into the satellite's buffer
 
     // The satellite we want to target
     U16 target_sat;
+    bool completed = false; // True if it arrives at its destination satellites and needs to be sent to its user now
+
+    bool operator<(const packet& other) const {
+        return target_sat < other.target_sat; 
+    };
+    
+    bool operator>(const packet& other) const {
+        return target_sat > other.target_sat;
+    };
 };
 
 // Only station or satellite need to know how this struct is structured
@@ -88,8 +120,29 @@ struct shared_mem_container {
 
     std::array<packet, 64> packets; // Array of packets. Simulates the packet sent from a user to a satellite
 
-    alignas(64) std::atomic<U32> read_tail;
-    alignas(64) std::atomic<U32> write_tail;
+    alignas(64) std::atomic<U32> read_tail{0};
+    alignas(64) std::atomic<U32> write_tail{0};
+
+    routing_table table;
 
     bool initialized = false;
+};
+
+struct user_sat_mem {
+    std::array<packet, 64> payloads;
+
+    alignas(64) std::atomic<U32> read_tail{0};
+    alignas(64) std::atomic<U32> write_tail{0};
+};
+
+inline float mag_sq(const Vector3& x){
+    return (x.X*x.X + x.Y*x.Y + x.Z*x.Z);
+};
+
+inline float mag(const Vector3& x){
+    return std::sqrt(mag_sq(x));
+}
+
+inline float dot_func(const Vector3& a, const Vector3& b){
+    return (a.X * b.X + a.Y * b.Y + a.Z * b.Z);
 };

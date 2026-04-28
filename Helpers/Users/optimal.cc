@@ -1,11 +1,5 @@
 #include "optimal.h"
 
-// I understand that use of artificial intelligence (AI) on this assessment is prohibited.
-
-float dot_func(const Vector3& a, const Vector3& b){
-    return (a.X * b.X + a.Y * b.Y + a.Z * b.Z);
-}
-
 __attribute__((target("avx2,fma")))
 std::vector<U16> solve_helper(const Vector3& u_pos, const float R_Squared, const float dot_p1, const U16 num_sats, const Coordinates<MAX_SATELLITES>& positions){
     std::vector<U16> sat_ids;
@@ -86,10 +80,6 @@ std::vector<U16> solve_helper(const Vector3& u_pos, const float R_Squared, const
     }
 
     return sat_ids;
-}
-
-float mag_sq(const Vector3& x){
-    return (x.X*x.X + x.Y*x.Y + x.Z*x.Z);
 }
 
 std::vector<U16> optimal_sats(const Vector3& user, const Satellites* sats)

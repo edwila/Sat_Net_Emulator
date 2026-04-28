@@ -32,7 +32,65 @@ std::tuple<float, float, float> Satellite_Processor::get_position(size_t idx){
         container->positions.X[idx],
         container->positions.Y[idx],
         container->positions.Z[idx]
-    };;
+    };
+};
+
+Vector3 Satellite_Processor::get_position_as_vector(size_t idx){
+    return Vector3{
+        container->positions.X[idx],
+        container->positions.Y[idx],
+        container->positions.Z[idx]
+    };
+};
+
+std::priority_queue<std::pair<U64, packet>, std::vector<std::pair<U64, packet>>, std::greater<std::pair<U64, packet>>>* Satellite_Processor::get_latency(){
+    return &latency_emulator;
+};
+
+void Satellite_Processor::process_packet(shared_mem_container* chunk1, user_sat_mem* chunk2, packet& read_packet){
+    out("[Satellite Worker] [@", get_elapsed_time(), "ms] Routing packet... Target satellite: [", read_packet.target_sat, "] from user [", read_packet.source_user, "] to satellite [", read_packet.next_sat, "] with message [", std::string(read_packet.msg), "]!");
+
+    if(read_packet.next_sat == read_packet.target_sat){
+        read_packet.completed = true;
+
+        out("[Satellite Worker] Packet arrived successfully!");
+
+        chunk2->payloads[chunk2->write_tail & 63] = std::move(read_packet);
+        chunk2->write_tail.fetch_add(1);
+
+        return;
+    }
+
+    routing_table& table = chunk1->table;
+
+    U8 current_rt_key = table.routing_table_key.load(std::memory_order_acquire);
+
+    r_t* current_rt = current_rt_key == 0 ? &table.table_A : &table.table_B;
+
+    U16 next_sat = current_rt->at(read_packet.next_sat)[read_packet.target_sat];
+
+    if(next_sat == std::numeric_limits<U16>::max()){
+        out("[Satellite Worker] Packet lost in space! Cannot make it to satellite [", read_packet.target_sat, "].");
+        return;
+    }
+
+    if(next_sat == 0 && read_packet.target_sat != 0){
+        out("[Satellite Worker] Packet dropped. Routing table not done being built!");
+        return;
+    }
+
+    // Calculate distance between read_packet.next_sat and next_sat, then multiply by SOL, and that's our latency
+    U64 latency = (mag(get_position_as_vector(read_packet.next_sat) - get_position_as_vector(next_sat)) / SOL) * 1000.0f;
+
+    if(latency == 0) latency = 1;
+
+    read_packet.next_sat = next_sat;
+
+    latency_emulator.push(std::make_pair(get_elapsed_time()+latency, std::move(read_packet)));
+}
+
+std::queue<packet>* Satellite_Processor::get_queue(){
+    return &in_constellation;
 };
 
 __attribute__((target("avx2,fma")))
@@ -152,7 +210,7 @@ void Satellite_Processor::populate(U16 amount = 0xFFFF) {
         // TODO: Adjust to be orthogonal to satellite's position vector
         container->velocities.X[i] = container->velocities.Y[i] = container->velocities.Z[i] = 0;
 
-        std::cout << "[Satellite " << i << "]: <" << x << ", " << y << ", " << z << "> [" << std::sqrt(x*x + y*y + z*z) << "]\n";
+        out("[Satellite ", i, "]: <", x, ", ", y, ", ", z, "> [", std::sqrt(x*x + y*y + z*z), "]");
     }
 
     // Batch satellites into threads here, and compute their orbital math using SIMD

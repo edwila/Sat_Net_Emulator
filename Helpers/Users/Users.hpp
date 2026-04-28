@@ -34,6 +34,8 @@ class User_Processor {
 
         int32_t get_acting_user() const;
 
+        bool is_alive() const;
+
         int32_t get_optimal_sat(U16 user_index, bool ensure_connection = false) const;
 
         // Populate user container
