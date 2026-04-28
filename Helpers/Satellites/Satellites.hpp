@@ -19,7 +19,7 @@ class Satellite_Processor {
         bool active;
         void sat_helper(float dt, U16 batch_size, unsigned int thread_index, U16 end_idx_for_thread);
         std::queue<packet> in_constellation;
-        std::priority_queue<std::pair<U64, packet>, std::vector<std::pair<U64, packet>>, std::greater<std::pair<U64, packet>>> latency_emulator;
+        time_pq latency_emulator;
     public:
         Satellite_Processor(Satellites* ctr); // Initializes start to be std::chrono::steady_clock::now()
         ~Satellite_Processor();
@@ -35,7 +35,7 @@ class Satellite_Processor {
 
         std::queue<packet>* get_queue();
 
-        std::priority_queue<std::pair<U64, packet>, std::vector<std::pair<U64, packet>>, std::greater<std::pair<U64, packet>>>* get_latency();
+        time_pq* get_latency();
 
         void process_packet(shared_mem_container* chunk1, user_sat_mem* chunk2, packet& read_packet);
 

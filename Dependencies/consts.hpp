@@ -141,8 +141,10 @@ inline float mag_sq(const Vector3& x){
 
 inline float mag(const Vector3& x){
     return std::sqrt(mag_sq(x));
-}
+};
 
 inline float dot_func(const Vector3& a, const Vector3& b){
     return (a.X * b.X + a.Y * b.Y + a.Z * b.Z);
 };
+
+using time_pq = std::priority_queue<std::pair<U64, packet>, std::vector<std::pair<U64, packet>>, std::greater<std::pair<U64, packet>>>;

@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
     std::queue<packet>* sat_proc_q = sat_proc.get_queue();
 
-    std::priority_queue<std::pair<U64, packet>, std::vector<std::pair<U64, packet>>, std::greater<std::pair<U64, packet>>>* latency = sat_proc.get_latency();
+    time_pq* latency = sat_proc.get_latency();
 
     std::thread([chunk1, chunk2, &sat_proc, sat_proc_q, latency](){
         while(sat_proc.is_alive()){

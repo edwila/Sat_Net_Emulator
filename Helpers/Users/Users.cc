@@ -68,6 +68,14 @@ Vector3 User_Processor::get_position_as_vector(size_t idx){
     };
 }
 
+Vector3 User_Processor::get_sat_position_as_vector(size_t idx){
+    return Vector3{
+        sat_container->positions.X[idx],
+        sat_container->positions.Y[idx],
+        sat_container->positions.Z[idx]
+    };
+}
+
 void User_Processor::ssh(int32_t target_user){
     acting_user = target_user;
 

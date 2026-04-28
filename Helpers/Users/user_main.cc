@@ -107,16 +107,26 @@ int main(int argc, char* argv[]) {
             std::cin >> target_user;
             std::getline(std::cin, msg);
 
+            U16 next_sat = user_proc.get_optimal_sat(acting_user);
+
             packet to_push;
             to_push.source_user = acting_user;
             to_push.target_user = target_user;
             to_push.target_sat = user_proc.get_optimal_sat(target_user);
-            to_push.next_sat = user_proc.get_optimal_sat(acting_user);
+            to_push.next_sat = next_sat;
 
             std::memcpy(to_push.msg, msg.c_str()+1, msg.length());
 
-            chunk1->packets[chunk1->write_tail & 63] = std::move(to_push);
-            chunk1->write_tail.fetch_add(1);
+            U64 latency = (mag(user_proc.get_sat_position_as_vector(next_sat) - user_proc.get_position_as_vector(acting_user)) / SOL) * 1000.0f;
+            if(latency == 0) latency = 1;
+
+            std::thread([latency, chunk1, &to_push](){
+                std::this_thread::sleep_for(std::chrono::milliseconds(latency)); // Simulate latency of packet getting up to the satellite
+
+                size_t slot = chunk1->write_tail.fetch_add(1);
+
+                chunk1->packets[slot & 63] = std::move(to_push);
+            }).detach();
         }
     }
 

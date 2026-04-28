@@ -43,7 +43,7 @@ Vector3 Satellite_Processor::get_position_as_vector(size_t idx){
     };
 };
 
-std::priority_queue<std::pair<U64, packet>, std::vector<std::pair<U64, packet>>, std::greater<std::pair<U64, packet>>>* Satellite_Processor::get_latency(){
+time_pq* Satellite_Processor::get_latency(){
     return &latency_emulator;
 };
 
