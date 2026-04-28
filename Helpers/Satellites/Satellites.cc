@@ -207,8 +207,15 @@ void Satellite_Processor::populate(U16 amount = 0xFFFF) {
         container->positions.Z[i] = z;
 
         // Initial velocity = <0, 0, 0> => Falling towards the center of the Earth
-        // TODO: Adjust to be orthogonal to satellite's position vector
-        container->velocities.X[i] = container->velocities.Y[i] = container->velocities.Z[i] = 0;
+        // TODO: Adjust to be orthogonal to satellite's position vector and some random vector T
+        // v = sqrt(mu/r) <- SCALAR to multiply by the unit result of the cross
+        Vector3 T = Vector3::cross(Vector3{x, y, z}, Vector3{T_x, T_y, T_z});
+        T = T / mag(T);
+        T = T * std::sqrt(mu/LEO_RAD);
+
+        container->velocities.X[i] = T.X;
+        container->velocities.Y[i] = T.Y;
+        container->velocities.Z[i] = T.Z;
 
         out("[Satellite ", i, "]: <", x, ", ", y, ", ", z, "> [", std::sqrt(x*x + y*y + z*z), "]");
     }

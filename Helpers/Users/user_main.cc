@@ -49,7 +49,16 @@ int main(int argc, char* argv[]) {
                 packet read_packet = chunk2->payloads[chunk2->read_tail & 63];
                 chunk2->read_tail.fetch_add(1);
 
-                out("[User Worker] [Incoming message for: [", read_packet.target_user, "] from: [", read_packet.source_user, "]]: ", std::string(read_packet.msg));
+                // Simulate latency here
+                std::thread([read_packet, &user_proc](){
+                    U64 latency = (mag(user_proc.get_position_as_vector(read_packet.target_user) - user_proc.get_sat_position_as_vector(read_packet.target_sat)) / SOL) * 1000.0f;
+
+                    if(latency == 0) latency = 1;
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds(latency));
+
+                    out("[User Worker] [Incoming message for: [", read_packet.target_user, "] from: [", read_packet.source_user, "]]: ", std::string(read_packet.msg));
+                }).detach();
             }
 
             std::this_thread::yield();

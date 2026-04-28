@@ -24,8 +24,6 @@ using U16 = uint16_t;
 using U32 = uint32_t;
 using U64 = uint64_t;
 
-inline unsigned int MAX_THREADS = std::thread::hardware_concurrency() == 0 ? 16 : std::thread::hardware_concurrency();
-
 // Constants
 static constexpr U32 SOL = 299792458; // Speed of light (meters/s)
 static constexpr U16 MAX_USERS = 65528; // Max user connectivity (65536 * 32[size of float] = 2097152 bits, or 262144 bytes, enough to fit in an entire L2 cache)
@@ -46,6 +44,10 @@ struct Vector3 {
     };
     Vector3 operator*(float other) const {
         return {X*other, Y*other, Z*other};
+    };
+    static Vector3 cross(const Vector3& a, const Vector3& b) {
+        // Cross product
+        return {a.Y*b.Z - a.Z*b.Y, a.Z*b.X - a.X*b.Z, a.X*b.Y - a.Y*b.X};
     };
     Vector3 operator/(float other) const {
         return {X/other, Y/other, Z/other};

@@ -8,7 +8,7 @@
 #include <random>
 #include <iostream>
 
-using ms = std::chrono::milliseconds;
+static unsigned int MAX_THREADS = std::thread::hardware_concurrency() == 0 ? 16 : std::thread::hardware_concurrency();
 
 class Satellite_Processor {
     private:
