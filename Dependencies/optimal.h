@@ -1,4 +1,4 @@
-#include "../../Dependencies/consts.hpp"
+#include "consts.hpp"
 
 #include <vector> // std::vector
 #include <fstream> // ofstream

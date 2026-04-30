@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/satellite_worker.dir/Helpers/Satellites/satellite_main.cc.o CMakeFiles/satellite_worker.dir/Helpers/Satellites/Satellites.cc.o -o bin/satellite_worker  -lrt -lpthread 
+/usr/bin/c++ CMakeFiles/satellite_worker.dir/Helpers/Satellites/satellite_main.cc.o CMakeFiles/satellite_worker.dir/Helpers/Satellites/Satellites.cc.o CMakeFiles/satellite_worker.dir/Dependencies/optimal.cc.o -o bin/satellite_worker  -lrt -lpthread 

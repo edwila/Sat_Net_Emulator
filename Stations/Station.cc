@@ -161,9 +161,9 @@ int main(){
     Satellites retrieve their routing table entry, then go on with their lives.
     */
 
-    int global_rf_space_fd = shm_open("/global_rf_space", O_CREAT | O_RDWR, 0600);
+    int global_rf_space_fd = shm_open("/global_rf_space", O_CREAT | O_RDWR | O_TRUNC, 0666);
     // This shared memory will be for satellites communicating with the station (satellite requesting routing table, station providing routing table)
-    int user_sat_rf_space_fd = shm_open("/user_sat_rf_space", O_CREAT | O_RDWR, 0600);
+    int user_sat_rf_space_fd = shm_open("/user_sat_rf_space", O_CREAT | O_RDWR | O_TRUNC, 0666);
 
     unsigned long long len = sizeof(shared_mem_container);
     unsigned long long user_sat_len = sizeof(user_sat_mem);

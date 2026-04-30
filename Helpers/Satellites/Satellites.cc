@@ -1,7 +1,8 @@
 #include "Satellites.hpp"
 
-Satellite_Processor::Satellite_Processor(Satellites* ctr){
+Satellite_Processor::Satellite_Processor(Satellites* ctr, Users* ctr2){
     container = ctr;
+    user_ctr = ctr2;
     active = true;
     start = std::chrono::steady_clock::now();
     threads.reserve(MAX_THREADS);
@@ -47,18 +48,38 @@ time_pq* Satellite_Processor::get_latency(){
     return &latency_emulator;
 };
 
+Vector3 Satellite_Processor::get_user_position_as_vector(size_t idx){
+    return Vector3{
+        user_ctr->positions.X[idx],
+        user_ctr->positions.Y[idx],
+        user_ctr->positions.Z[idx]
+    };
+};
+
 void Satellite_Processor::process_packet(shared_mem_container* chunk1, user_sat_mem* chunk2, packet& read_packet){
     out("[Satellite Worker] [@", get_elapsed_time(), "ms] Routing packet... Target satellite: [", read_packet.target_sat, "] from user [", read_packet.source_user, "] to satellite [", read_packet.next_sat, "] with message [", std::string(read_packet.msg), "]!");
 
     if(read_packet.next_sat == read_packet.target_sat){
-        read_packet.completed = true;
+        // Confirm if get_optimal(target_user) == read_packet.target_sat
+        // If it is, then do nothing
+        // If it isn't, reroute to the new get_optimal(target_user)
+        std::vector<U16> optims = optimal_sats(get_user_position_as_vector(read_packet.target_user), container);
 
-        out("[Satellite Worker] Packet arrived successfully!");
+        if(optims.front() == read_packet.target_sat){
+            // Target satellite is the same! Just send it to user
 
-        chunk2->payloads[chunk2->write_tail & 63] = std::move(read_packet);
-        chunk2->write_tail.fetch_add(1);
+            read_packet.completed = true;
 
-        return;
+            out("[Satellite Worker] Packet arrived successfully!");
+
+            chunk2->payloads[chunk2->write_tail & 63] = std::move(read_packet);
+            chunk2->write_tail.fetch_add(1);
+
+            return;
+        } else{
+            // Target satellite changed! We need to set our target satellite and re-route
+            read_packet.target_sat = optims.front();
+        }
     }
 
     routing_table& table = chunk1->table;
@@ -199,7 +220,7 @@ void Satellite_Processor::populate(U16 amount = 0xFFFF) {
         z = LEO_RAD * cos_phi;
 
         float T_x = t_dist(gen);
-        float T_y = t_dist(gen);
+        float T_y = std::abs(t_dist(gen));
         float T_z = t_dist(gen);
 
         container->positions.X[i] = x;

@@ -10,34 +10,40 @@ int main(int argc, char* argv[]) {
 
     out("[User Worker] Booting up with ", num_users, " users...");
 
-    int global_rf_space_fd = shm_open("/global_rf_space", O_RDWR, 0600);
+    int global_rf_space_fd = shm_open("/global_rf_space", O_RDWR, 0666);
     // This shared memory will be for satellites communicating with the station (satellite requesting routing table, station providing routing table)
-    int user_sat_rf_space_fd = shm_open("/user_sat_rf_space", O_RDWR, 0600);
+    int user_sat_rf_space_fd = shm_open("/user_sat_rf_space", O_RDWR, 0666);
 
     unsigned long long len = sizeof(shared_mem_container);
     unsigned long long user_sat_len = sizeof(user_sat_mem);
 
-    int truncate_result = ftruncate(global_rf_space_fd, len);
     int user_sat_truncate = ftruncate(user_sat_rf_space_fd, user_sat_len);
-
-    if(truncate_result == -1){
-        out("[Satellite Worker] Failed to truncate fd [", global_rf_space_fd, "]! Err: ", errno);
-
-        return 1;
-    }
-
+    
     if(user_sat_truncate == -1){
         out("[Satellite Worker] Failed to truncate fd [", user_sat_rf_space_fd, "]! Err: ", errno);
 
         return 1;
     }
 
-    shared_mem_container* chunk1 = (shared_mem_container*)mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, global_rf_space_fd, 0);
-    user_sat_mem* chunk2 = (user_sat_mem*)mmap(nullptr, user_sat_len, PROT_READ | PROT_WRITE, MAP_SHARED, user_sat_rf_space_fd, 0);
+    void* chunk1_alloc = mmap(nullptr, len, PROT_READ | PROT_WRITE, MAP_SHARED, global_rf_space_fd, 0);
+    void* chunk2_alloc = mmap(nullptr, user_sat_len, PROT_READ | PROT_WRITE, MAP_SHARED, user_sat_rf_space_fd, 0);
+
+    if(chunk1_alloc == nullptr){
+        out("Failed to mmap chunk1!");
+        return 1;
+    }
+
+    if(chunk2_alloc == nullptr){
+        out("Failed to mmap chunk2!");
+        return 1;
+    }
+
+    shared_mem_container* chunk1 = (shared_mem_container*)chunk1_alloc;
+    user_sat_mem* chunk2 = (user_sat_mem*)chunk2_alloc;
 
     out("[User Worker] Shared memory allocated successfully.");
 
-    User_Processor user_proc(&chunk1->container);
+    User_Processor user_proc(&chunk1->container, &chunk1->user_container);
     user_proc.populate(num_users);
 
     out("[User Worker] Spawning thread to handle messages...");

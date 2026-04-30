@@ -3,6 +3,7 @@
 #endif
 
 #include "../../Dependencies/consts.hpp"
+#include "../../Dependencies/optimal.h"
 #include <chrono>
 #include <vector>
 #include <random>
@@ -14,6 +15,7 @@ class Satellite_Processor {
     private:
         std::chrono::steady_clock::time_point start; // Start timestamp
         Satellites* container;
+        Users* user_ctr;
         std::vector<std::thread> threads;
         float time_scalar = 1.0f; // How much faster time moves (sim time)
         bool active;
@@ -21,13 +23,15 @@ class Satellite_Processor {
         std::queue<packet> in_constellation;
         time_pq latency_emulator;
     public:
-        Satellite_Processor(Satellites* ctr); // Initializes start to be std::chrono::steady_clock::now()
+        Satellite_Processor(Satellites* ctr, Users* ctr2); // Initializes start to be std::chrono::steady_clock::now()
         ~Satellite_Processor();
 
         U32 get_elapsed_time(); // Return the elapsed time since firing up the satellite processor
 
         std::tuple<float, float, float> get_position(size_t idx);
         Vector3 get_position_as_vector(size_t idx);
+
+        Vector3 get_user_position_as_vector(size_t idx);
 
         void kill();
 

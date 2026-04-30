@@ -8,15 +8,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # Output all compiled binaries to the build/bin folder
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(DEPENDENCY_SOURCES
+    Dependencies/optimal.cc 
+)
+
 set(SATELLITE_SOURCES
     Helpers/Satellites/satellite_main.cc
     Helpers/Satellites/Satellites.cc
+    ${DEPENDENCY_SOURCES} 
 )
 
 set(USER_SOURCES
     Helpers/Users/user_main.cc
     Helpers/Users/Users.cc
-    Helpers/Users/optimal.cc
+    ${DEPENDENCY_SOURCES}
 )
 
 add_library(shared_interface INTERFACE)

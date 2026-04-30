@@ -10,21 +10,14 @@ int main(int argc, char* argv[]) {
 
     out("[Satellite Worker] Opening shared memory with station...");
 
-    int global_rf_space_fd = shm_open("/global_rf_space", O_RDWR, 0600);
+    int global_rf_space_fd = shm_open("/global_rf_space", O_RDWR, 0666);
     // This shared memory will be for satellites communicating with the station (satellite requesting routing table, station providing routing table)
-    int user_sat_rf_space_fd = shm_open("/user_sat_rf_space", O_RDWR, 0600);
+    int user_sat_rf_space_fd = shm_open("/user_sat_rf_space", O_RDWR, 0666);
 
     unsigned long long len = sizeof(shared_mem_container);
     unsigned long long user_sat_len = sizeof(user_sat_mem);
 
-    int truncate_result = ftruncate(global_rf_space_fd, len);
     int user_sat_truncate = ftruncate(user_sat_rf_space_fd, user_sat_len);
-
-    if(truncate_result == -1){
-        out("[Satellite Worker] Failed to truncate fd [", global_rf_space_fd, "]! Err: ", errno);
-
-        return 1;
-    }
 
     if(user_sat_truncate == -1){
         out("[Satellite Worker] Failed to truncate fd [", user_sat_rf_space_fd, "]! Err: ", errno);
@@ -39,7 +32,7 @@ int main(int argc, char* argv[]) {
 
     out("[Satellite Worker] Booting up with ", num_sats, " satellites...");
 
-    Satellite_Processor sat_proc(&chunk1->container);
+    Satellite_Processor sat_proc(&chunk1->container, &chunk1->user_container);
     sat_proc.populate(num_sats);
 
     out("[Satellite Worker] Starting routing thread...");

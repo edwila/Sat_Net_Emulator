@@ -1,5 +1,5 @@
-/mnt/c/Users/gensc/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/station_driver.dir
-/mnt/c/Users/gensc/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/satellite_worker.dir
-/mnt/c/Users/gensc/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/user_worker.dir
-/mnt/c/Users/gensc/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/edit_cache.dir
-/mnt/c/Users/gensc/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/Gener/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/station_driver.dir
+/mnt/c/Users/Gener/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/satellite_worker.dir
+/mnt/c/Users/Gener/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/user_worker.dir
+/mnt/c/Users/Gener/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/Gener/Desktop/Projects/Sat_Net_Emulator/build/CMakeFiles/rebuild_cache.dir

@@ -3,7 +3,7 @@
 #endif
 
 #include "../../Dependencies/consts.hpp"
-#include "optimal.h"
+#include "../../Dependencies/optimal.h"
 #include <chrono>
 #include <vector>
 #include <random>
@@ -14,7 +14,7 @@ static unsigned int MAX_THREADS = std::thread::hardware_concurrency() == 0 ? 16 
 class User_Processor {
     private:
         std::chrono::steady_clock::time_point start; // Start timestamp
-        Users container;
+        Users* container;
         Satellites* sat_container;
         std::vector<std::thread> threads;
         float time_scalar = 1.0f; // How much faster time moves (sim time)
@@ -23,7 +23,7 @@ class User_Processor {
         time_pq latency_emulator;
         std::queue<packet> waiting_to_send;
     public:
-        User_Processor(Satellites* ctr); // Initializes start to be std::chrono::steady_clock::now()
+        User_Processor(Satellites* ctr, Users* users); // Initializes start to be std::chrono::steady_clock::now()
         ~User_Processor();
 
         U32 get_elapsed_time(); // Return the elapsed time since 

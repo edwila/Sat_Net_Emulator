@@ -119,6 +119,7 @@ struct packet {
 // Only station or satellite need to know how this struct is structured
 struct shared_mem_container {
     Satellites container;
+    Users user_container;
 
     std::array<packet, 64> packets; // Array of packets. Simulates the packet sent from a user to a satellite
 

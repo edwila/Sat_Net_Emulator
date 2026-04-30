@@ -1,7 +1,8 @@
 #include "Users.hpp"
 
-User_Processor::User_Processor(Satellites* ctr){
+User_Processor::User_Processor(Satellites* ctr, Users* users){
     sat_container = ctr;
+    container = users;
 
     acting_user = -1;
 
@@ -30,17 +31,17 @@ int32_t User_Processor::get_optimal_sat(U16 user_index, bool ensure_connection) 
     // Recall that all satellites are stored at sat_container
 
     std::vector<U16> optimals = optimal_sats(Vector3{
-        container.positions.X[user_index],
-        container.positions.Y[user_index],
-        container.positions.Z[user_index]
+        container->positions.X[user_index],
+        container->positions.Y[user_index],
+        container->positions.Z[user_index]
     }, sat_container);
 
     if(ensure_connection && optimals.empty()){
         while(optimals.empty()){
             optimals = optimal_sats(Vector3{
-                container.positions.X[user_index],
-                container.positions.Y[user_index],
-                container.positions.Z[user_index]
+                container->positions.X[user_index],
+                container->positions.Y[user_index],
+                container->positions.Z[user_index]
             }, sat_container);
         }
     }
@@ -54,17 +55,17 @@ U32 User_Processor::get_elapsed_time(){
 
 std::tuple<float, float, float> User_Processor::get_position(size_t idx){
     return {
-        container.positions.X[idx],
-        container.positions.Y[idx],
-        container.positions.Z[idx]
+        container->positions.X[idx],
+        container->positions.Y[idx],
+        container->positions.Z[idx]
     };
 }
 
 Vector3 User_Processor::get_position_as_vector(size_t idx){
     return Vector3{
-        container.positions.X[idx],
-        container.positions.Y[idx],
-        container.positions.Z[idx]
+        container->positions.X[idx],
+        container->positions.Y[idx],
+        container->positions.Z[idx]
     };
 }
 
@@ -89,7 +90,7 @@ void User_Processor::ssh(int32_t target_user){
 // Populate user container
 void User_Processor::populate(U16 amount = 0xFFFF) {
     active = true;
-    container.initialized_users = amount;
+    container->initialized_users = amount;
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<float> theta_dist(0.0f, 2.0f * PI);
@@ -123,9 +124,9 @@ void User_Processor::populate(U16 amount = 0xFFFF) {
         float T_y = t_dist(gen);
         float T_z = t_dist(gen);
 
-        container.positions.X[i] = x;
-        container.positions.Y[i] = y;
-        container.positions.Z[i] = z;
+        container->positions.X[i] = x;
+        container->positions.Y[i] = y;
+        container->positions.Z[i] = z;
 
         out("[User ", i, "]: <", x, ", ", y, ", ", z, "> [", std::sqrt(x*x + y*y + z*z), "]");
     }
