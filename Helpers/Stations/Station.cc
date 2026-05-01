@@ -3,10 +3,6 @@
 #endif
 
 #include "../Dependencies/consts.hpp"
-#include <iostream>
-#include <string>
-#include <cmath>
-#include <algorithm>
 
 // Build a cheap (and fast) adjacency matrix for satellites. We only want 4 satellite neighbors
 std::vector<std::vector<U16>> build_adjacency_matrix(Satellites* sats) {
@@ -15,18 +11,18 @@ std::vector<std::vector<U16>> build_adjacency_matrix(Satellites* sats) {
 
     for (U16 i = 0; i < total; i++) {
         std::vector<std::pair<float, U16>> visible_neighbors;
-        Vector3 a{sats->positions.X[i], sats->positions.Y[i], sats->positions.Z[i]};
+        Backend::Vector3 a{sats->positions.X[i], sats->positions.Y[i], sats->positions.Z[i]};
 
         for (U16 j = 0; j < total; j++) {
             if (i == j) continue;
 
-            Vector3 b{sats->positions.X[j], sats->positions.Y[j], sats->positions.Z[j]};
-            Vector3 c = b - a;
+            Backend::Vector3 b{sats->positions.X[j], sats->positions.Y[j], sats->positions.Z[j]};
+            Backend::Vector3 c = b - a;
             float dist = mag_sq(c);
 
             float t = -(dot_func(a, c)) / dist;
             if (t >= 0.0f && t <= 1.0f) {
-                Vector3 casted = a + (c * t);
+                Backend::Vector3 casted = a + (c * t);
                 if (mag_sq(casted) < (R_EARTH * R_EARTH)) continue; // Blocked by Earth
             }
 
@@ -87,11 +83,11 @@ void calculate_dijkstra(Satellites* sats, r_t* inactive, const std::vector<std::
 
                     if(d > distances[sat_id]) continue;
 
-                    Vector3 a{sats->positions.X[sat_id], sats->positions.Y[sat_id], sats->positions.Z[sat_id]};
+                    Backend::Vector3 a{sats->positions.X[sat_id], sats->positions.Y[sat_id], sats->positions.Z[sat_id]};
 
                     for(U16 sat : adj_matrix[sat_id]){
-                        Vector3 b{sats->positions.X[sat], sats->positions.Y[sat], sats->positions.Z[sat]};
-                        Vector3 c = b - a;
+                        Backend::Vector3 b{sats->positions.X[sat], sats->positions.Y[sat], sats->positions.Z[sat]};
+                        Backend::Vector3 c = b - a;
                         
                         float edge_cost = std::sqrt(mag_sq(c));
 
@@ -127,14 +123,20 @@ void calculate_dijkstra(Satellites* sats, r_t* inactive, const std::vector<std::
     }
 }
 
-int main(){
-    U16 num_sats, num_users;    
+int main(int argc, char* argv[]){
+    U16 num_sats, num_users; 
 
-    out("[Station] Enter number of satellites: ");
-    std::cin >> num_sats;
+    if(argc > 2){
+        num_sats = std::stoi(argv[1]);
+        num_users = std::stoi(argv[2]);
+    } else{
+        out("[Station] Enter number of satellites: ");
+        std::cin >> num_sats;
 
-    out("[Station] Enter number of users: ");
-    std::cin >> num_users;
+        out("[Station] Enter number of users: ");
+        std::cin >> num_users;
+    }
+    
 
     /*
     We want to emulate this communication scheme:

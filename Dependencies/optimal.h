@@ -66,4 +66,4 @@ struct user_container {
 };
 
 // Generate a set of legal beams to cover as many users as possible.
-std::vector<U16> optimal_sats(const Vector3& user, const Satellites* sats);
+std::vector<U16> optimal_sats(const Backend::Vector3& user, const Satellites* sats);

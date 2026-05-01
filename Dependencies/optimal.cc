@@ -1,7 +1,7 @@
 #include "optimal.h"
 
 __attribute__((target("avx2,fma")))
-std::vector<U16> solve_helper(const Vector3& u_pos, const float R_Squared, const float dot_p1, const U16 num_sats, const Coordinates<MAX_SATELLITES>& positions){
+std::vector<U16> solve_helper(const Backend::Vector3& u_pos, const float R_Squared, const float dot_p1, const U16 num_sats, const Coordinates<MAX_SATELLITES>& positions){
     std::vector<U16> sat_ids;
     sat_ids.reserve(num_sats);
 
@@ -69,9 +69,9 @@ std::vector<U16> solve_helper(const Vector3& u_pos, const float R_Squared, const
     // We can't really include them into the SIMD logic because then we are basically reintroducing unaligned access
     // + gonna be shifting to chunk the satellites
     for(; k < num_sats; k++){
-        Vector3 s_pos = {positions.X[k], positions.Y[k], positions.Z[k]};
+        Backend::Vector3 s_pos = {positions.X[k], positions.Y[k], positions.Z[k]};
         if(dot_func(u_pos, s_pos) < R_Squared) continue;
-        Vector3 beam = s_pos - u_pos;
+        Backend::Vector3 beam = s_pos - u_pos;
         float dot_val = dot_func(u_pos, beam);
         
         if(dot_val > 0.0f && (dot_val * dot_val) >= (dot_p1 * mag_sq(beam))) {
@@ -82,7 +82,7 @@ std::vector<U16> solve_helper(const Vector3& u_pos, const float R_Squared, const
     return sat_ids;
 }
 
-std::vector<U16> optimal_sats(const Vector3& user, const Satellites* sats)
+std::vector<U16> optimal_sats(const Backend::Vector3& user, const Satellites* sats)
 {
     static const float R_Squared = mag_sq(user); // Radius of earth squared. Used to cull users past the horizon
 
@@ -93,7 +93,7 @@ std::vector<U16> optimal_sats(const Vector3& user, const Satellites* sats)
     std::vector<U16> to_ret = solve_helper(user, R_Squared, (COS_MAX_A_SQUARED * mag_sq(user)), num_sats, positions);
 
     std::sort(to_ret.begin(), to_ret.end(), [&](U16 a, U16 b){
-        return mag_sq(Vector3{positions.X[a], positions.Y[a], positions.Z[a]}-user) < mag_sq(Vector3{positions.X[b], positions.Y[b], positions.Z[b]}-user);
+        return mag_sq(Backend::Vector3{positions.X[a], positions.Y[a], positions.Z[a]}-user) < mag_sq(Backend::Vector3{positions.X[b], positions.Y[b], positions.Z[b]}-user);
     });
 
     return to_ret;

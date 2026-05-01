@@ -30,9 +30,9 @@ class User_Processor {
 
         std::tuple<float, float, float> get_position(size_t idx);
 
-        Vector3 get_position_as_vector(size_t idx);
+        Backend::Vector3 get_position_as_vector(size_t idx);
 
-        Vector3 get_sat_position_as_vector(size_t idx);
+        Backend::Vector3 get_sat_position_as_vector(size_t idx);
 
         void ssh(int32_t target_user);
 

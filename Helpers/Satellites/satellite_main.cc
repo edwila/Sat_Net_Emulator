@@ -1,11 +1,12 @@
 #include "Satellites.hpp"
-#include <iostream>
-#include <string>
 
 int main(int argc, char* argv[]) {
     U16 num_sats = 0xFFFF;
     if (argc > 1) {
         num_sats = std::stoi(argv[1]);
+    } else{
+        out("[Satellite Worker] Enter number of satellites:");
+        std::cin >> num_sats;
     }
 
     out("[Satellite Worker] Opening shared memory with station...");

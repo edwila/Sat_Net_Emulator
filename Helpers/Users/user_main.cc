@@ -1,11 +1,12 @@
 #include "Users.hpp"
-#include <iostream>
-#include <string>
 
 int main(int argc, char* argv[]) {
     U16 num_users = 0xFFFF; 
     if (argc > 1) {
         num_users = std::stoi(argv[1]);
+    } else{
+        out("[User Worker] Enter number of users:");
+        std::cin >> num_users;
     }
 
     out("[User Worker] Booting up with ", num_users, " users...");

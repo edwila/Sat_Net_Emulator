@@ -9,14 +9,16 @@
 #include <sys/mman.h> // mmap
 #include <sys/stat.h>
 #include <cstring> // std::memcpy
+#include <string> // C++-strings / std::stoi
 #include <fcntl.h> // flags
-#include <unistd.h> // modes
+#include <unistd.h> // modes, fork
 #include <cmath> // std::cos
 #include <queue> // std::priority_queue
 #include <utility> // std::pair
 #include <queue> // std::queue
 #include <iostream> // std::cout, std::cin
 #include <functional> // std::function
+#include <algorithm> // std::partial_sort
 
 // Types
 using U8 = uint8_t;
@@ -34,25 +36,28 @@ static constexpr float PI = 3.1415926;
 static constexpr float mu = 3.986004418e14;
 
 // Usables
-struct Vector3 {
-    float X, Y, Z;
-    Vector3 operator-(const Vector3& other) const {
-        return {X-other.X, Y-other.Y, Z-other.Z};
+namespace Backend {
+    struct Vector3 {
+        float X, Y, Z;
+        Backend::Vector3 operator-(const Backend::Vector3& other) const {
+            return {X-other.X, Y-other.Y, Z-other.Z};
+        };
+        Backend::Vector3 operator+(const Backend::Vector3& other) const {
+            return {X+other.X, Y+other.Y, Z+other.Z};
+        };
+        Backend::Vector3 operator*(float other) const {
+            return {X*other, Y*other, Z*other};
+        };
+        static Backend::Vector3 cross(const Backend::Vector3& a, const Backend::Vector3& b) {
+            // Cross product
+            return {a.Y*b.Z - a.Z*b.Y, a.Z*b.X - a.X*b.Z, a.X*b.Y - a.Y*b.X};
+        };
+        static Backend::Vector3 unit(const Backend::Vector3& a);
+        Backend::Vector3 operator/(float other) const {
+            return {X/other, Y/other, Z/other};
+        };
     };
-    Vector3 operator+(const Vector3& other) const {
-        return {X+other.X, Y+other.Y, Z+other.Z};
-    };
-    Vector3 operator*(float other) const {
-        return {X*other, Y*other, Z*other};
-    };
-    static Vector3 cross(const Vector3& a, const Vector3& b) {
-        // Cross product
-        return {a.Y*b.Z - a.Z*b.Y, a.Z*b.X - a.X*b.Z, a.X*b.Y - a.Y*b.X};
-    };
-    Vector3 operator/(float other) const {
-        return {X/other, Y/other, Z/other};
-    };
-};
+}
 
 inline std::function<std::string()> cli_prompt_hook = []() { return ">> "; };
 
@@ -138,16 +143,20 @@ struct user_sat_mem {
     alignas(64) std::atomic<U32> write_tail{0};
 };
 
-inline float mag_sq(const Vector3& x){
+inline float mag_sq(const Backend::Vector3& x){
     return (x.X*x.X + x.Y*x.Y + x.Z*x.Z);
 };
 
-inline float mag(const Vector3& x){
+inline float mag(const Backend::Vector3& x){
     return std::sqrt(mag_sq(x));
 };
 
-inline float dot_func(const Vector3& a, const Vector3& b){
+inline float dot_func(const Backend::Vector3& a, const Backend::Vector3& b){
     return (a.X * b.X + a.Y * b.Y + a.Z * b.Z);
+};
+
+inline Backend::Vector3 Backend::Vector3::unit(const Backend::Vector3& a) {
+    return a / mag(a);
 };
 
 using time_pq = std::priority_queue<std::pair<U64, packet>, std::vector<std::pair<U64, packet>>, std::greater<std::pair<U64, packet>>>;

@@ -36,8 +36,8 @@ std::tuple<float, float, float> Satellite_Processor::get_position(size_t idx){
     };
 };
 
-Vector3 Satellite_Processor::get_position_as_vector(size_t idx){
-    return Vector3{
+Backend::Vector3 Satellite_Processor::get_position_as_vector(size_t idx){
+    return Backend::Vector3{
         container->positions.X[idx],
         container->positions.Y[idx],
         container->positions.Z[idx]
@@ -48,8 +48,8 @@ time_pq* Satellite_Processor::get_latency(){
     return &latency_emulator;
 };
 
-Vector3 Satellite_Processor::get_user_position_as_vector(size_t idx){
-    return Vector3{
+Backend::Vector3 Satellite_Processor::get_user_position_as_vector(size_t idx){
+    return Backend::Vector3{
         user_ctr->positions.X[idx],
         user_ctr->positions.Y[idx],
         user_ctr->positions.Z[idx]
@@ -230,7 +230,7 @@ void Satellite_Processor::populate(U16 amount = 0xFFFF) {
         // Initial velocity = <0, 0, 0> => Falling towards the center of the Earth
         // TODO: Adjust to be orthogonal to satellite's position vector and some random vector T
         // v = sqrt(mu/r) <- SCALAR to multiply by the unit result of the cross
-        Vector3 T = Vector3::cross(Vector3{x, y, z}, Vector3{T_x, T_y, T_z});
+        Backend::Vector3 T = Backend::Vector3::cross(Backend::Vector3{x, y, z}, Backend::Vector3{T_x, T_y, T_z});
         T = T / mag(T);
         T = T * std::sqrt(mu/LEO_RAD);
 
